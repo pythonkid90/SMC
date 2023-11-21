@@ -47,10 +47,11 @@ def create_plot():
 def get_stock_data():
     stocks = []
     stock_amount = 0
+    total_earnings = 0
     current_user.money = current_user.cash
     for user_stock in StockData.query.all():
         if user_stock.user_username == current_user.username:
-            # user = db.session.execute(db.select(User).filter_by(username=current_user.username)).scalar_one()
+
 
             cur_price = float(requests.get(f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE'
                                            f'&symbol={user_stock.stock}'
@@ -66,9 +67,12 @@ def get_stock_data():
                           'earnings': price_change * float(user_stock.shares)}
             stocks.append(stock_data)
 
+            total_earnings += price_change * float(user_stock.shares)
             stock_amount += (cur_price * float(user_stock.shares))
 
-    current_user.money = current_user.money + stock_amount
+    user = db.session.execute(db.select(User).filter_by(username=current_user.username)).scalar_one()
+    user.money = current_user.money + total_earnings
+
     return stocks, stock_amount
 
 
