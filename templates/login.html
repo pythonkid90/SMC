@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}
+    {% if request.path == '/login' %}
+        Login
+    {% else %}
+        Register
+    {% endif %}
+{% endblock %}
+
+
+{% block body %}
+    {% if request.path == '/login' %}
+            <a type="submit" href='/register' class="btn btn-primary btn-lg">Register</a>
+            <h1>Login to SMC</h1>
+    {% else %}
+        <a type="submit" href='/login' class="btn btn-outline-primary btn-lg">Login</a>
+        <h1>Register to SMC</h1>
+        <p>No email required, just type in your username and password.</p>
+    {% endif %}
+
+    <form method="post" id="login">
+        <h2>Username</h2>
+        <input class='form-control' name="username" required>
+
+        <br>
+
+        <h2>Password</h2>
+        <input name="password" type="password" class="form-control" required>
+
+        <br>
+
+        {% if request.path == '/login' %}
+            <button type="submit" class="btn btn-outline-primary btn-lg">Login</button>
+        {% else %}
+            <button type="submit" class="btn btn-primary btn-lg">Register</button>
+        {% endif %}
+
+    </form>
+{% endblock %}

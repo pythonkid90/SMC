@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if request.path == "/buy" %}
+        Buy a stock
+    {% else %}
+        Sell a stock
+    {% endif %}
+{% endblock %}
+
+
+{% block body %}
+
+    {% if request.path == "/buy" %}
+        <h1>Buy a stock</h1>
+    {% else %}
+        <h1>Sell a stock</h1>
+    {% endif %}
+
+    <form method="post">
+        <h2>Shares</h2>
+        <input name='shares' class='form-control' placeholder="Number of shares...">
+        <br>
+        <h2>Stock Ticker</h2>
+        <input name='ticker' class='form-control' placeholder="Enter ticker...">
+        <br>
+        {% if request.path == "/buy" %}
+            <button class='btn btn-primary' type="submit">Buy</button>
+        {% else %}
+            <button class='btn btn-primary' type="submit">Sell</button>
+        {% endif %}
+
+    </form>
+{% endblock %}

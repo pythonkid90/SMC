@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+    <h1>Stock Market Craziness</h1>
+    <br><br>
+
+    <h2>Stats</h2>
+    <section>
+        <div class="card-group">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Equity</h5>
+                    <p class="card-text">${{current_user.money}}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Cash</h5>
+                    <p class="card-text">${{current_user.cash}}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Money Made</h5>
+                    <p class="card-text">${{current_user.money - 100000}}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Stocks</h5>
+                        <p class="card-text">${{stock_amount}}</p>
+                </div>
+            </div>
+        </div>
+        <br><br>
+    </section>
+
+    <h2>My Stocks</h2> <img class='icon' src="static/table.svg">
+    <section>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Stock Name</th>
+                    <th>Shares Invested</th>
+                    <th>Starting Price</th>
+                    <th>Current Price</th>
+                    <th>Price Change</th>
+                    <th>Your Earnings</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in stocks %}
+                    <tr>
+                        <td>
+                            {{row['ticker']}}
+                        </td>
+                        <td>
+                            {{row['shares']}}
+                        </td>
+                        <td>
+                            ${{row['start_price']}}
+                        </td>
+                        <td>
+                            ${{row['cur_price']}}
+                        </td>
+                        <td>
+                            ${{row['price_change']}} ({{row['price_change_percent']}}%)
+                            <!--^ 10.0% ($10)-->
+                        </td>
+                        <td>
+                            ${{row['earnings']}}
+                        </td>
+
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <h2>Search Stock</h2>  <img class='icon' src="static/graph-up.svg">
+    <section>
+        <form role="search">
+          <input type="search" name='ticker' class="form-control" placeholder="Search ticker..." value="{{ticker if ticker}}">
+        </form>
+        <br>
+        {% if ticker %}
+            <div class="button-group">
+                {% for time_range in ['1D', '3D', '5D', '10D', '1M', '3M', '6M', 'YTD', '1Y', '5Y', 'All'] %}
+                    {% if cur_time_range == time_range %}
+                        <a class="btn btn-outline-primary active" href="/dashboard?ticker={{ticker}}&time-range={{time_range}}">{{time_range}}</a>
+                    {% else %}
+                        <a class="btn btn-outline-primary" href="/dashboard?ticker={{ticker}}&time-range={{time_range}}">{{time_range}}</a>
+                    {% endif %}
+
+                {% endfor %}
+            </div>
+
+            {% include 'graph.html' %}
+        {% endif %}
+    </section>
+
+{% endblock %}

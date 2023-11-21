@@ -1,0 +1,55 @@
+{% if current_user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg p-3 mb-3">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+            <div class="d-flex container">
+                <div class="nav-underline nav me-lg-auto">
+                    {% set tabs = {'/dashboard': 'Dashboard', '/buy': 'Buy a stock', '/sell': 'Sell a stock'} %}
+
+                    {% for key in tabs %}
+                        {% if key == request.path %}
+                            <a href="{{key}}" class="nav-link active px-2">{{tabs[key]}}</a>
+                        {% else %}
+                            <a href="{{key}}" class="nav-link px-2">{{tabs[key]}}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <form class="col-lg-auto mb-lg-0 me-lg-3" role="search">
+                  <input type="search" name='ticker' class="form-control" placeholder="Search ticker...">
+                </form>
+
+                <div class="dropdown text-end">
+                  <a class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="static/person-circle.svg" width="32" height="32" class="rounded-circle">
+                  </a>
+                  <ul class="dropdown-menu text-small">
+                    <li><a class="dropdown-item" href="/logout">Sign out</a></li>
+                  </ul>
+                </div>
+            </div>
+      </div>
+    </nav>
+{% else %}
+    <nav class="navbar navbar-expand-lg p-3 mb-3">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="d-flex container">
+            <div class="collapse navbar-collapse nav-underline nav me-lg-auto" id="nav">
+                {% set tabs = {'/': 'Home', '/login': 'Login', '/register': 'Register'} %}
+
+                {% for key in tabs %}
+                    {% if key == request.path %}
+                        <a href="{{key}}" class="nav-link active px-2">{{tabs[key]}}</a>
+                    {% else %}
+                        <a href="{{key}}" class="nav-link px-2">{{tabs[key]}}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </nav>
+{% endif %}
+
