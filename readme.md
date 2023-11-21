@@ -1,6 +1,6 @@
 # Stock Market Craziness
-<p style="color:blue; font-size: 1.3rem">v0.1</p>
 
+<p style="color:blue; font-size: 1.3rem">v0.1</p>
 
 Stock market game made using Flask and Python.
 
