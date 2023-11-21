@@ -48,3 +48,9 @@ nav {
     background-color: aliceblue;
     border-bottom-width: 10px;
 }
+.home-heading {
+    font-size: 3em;
+    display: block;
+    text-align: center;
+    margin: 0.2em
+}

@@ -63,10 +63,10 @@ def get_stock_data():
                           'cur_price': cur_price,
                           'price_change': price_change,
                           'price_change_percent': price_change / user_stock.start_price * 100,
-                          'earnings': price_change * int(user_stock.shares)}
+                          'earnings': price_change * float(user_stock.shares)}
             stocks.append(stock_data)
 
-            stock_amount += (cur_price * int(user_stock.shares))
+            stock_amount += (cur_price * float(user_stock.shares))
 
     current_user.money = current_user.money + stock_amount
     return stocks, stock_amount
@@ -150,22 +150,24 @@ def buy():
                                    f'function=GLOBAL_QUOTE&'
                                    f'symbol={request.form.get('ticker')}&'
                                    f'apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price'])
-        if start_price * int(request.form.get('shares')) > current_user.cash:
+        if start_price * float(request.form.get('shares')) > current_user.cash:
             flash('You cannot afford to buy that many shares!')
             return redirect(url_for('buy'))
 
         stock_in_db = db.session.execute(db.select(StockData).filter_by(stock=request.form.get('ticker'))).scalar_one_or_none()
         if stock_in_db:
-            stock_in_db.shares += int(request.form.get('shares'))
+            stock_in_db.shares += float(request.form.get('shares'))
         else:
-            db.session.add(StockData(stock=request.form.get('ticker'),
+            db.session.add(StockData(stock=request.form.get('ticker').upper(),
                                      shares=request.form.get('shares'),
                                      start_price=start_price,
                                      user=current_user
                                      ))
         # user = db.session.execute(db.select(User).filter_by(username=current_user.username)).scalar_one()
-        current_user.cash -= start_price * int(request.form.get('shares'))
+        current_user.cash -= start_price * float(request.form.get('shares'))
         db.session.commit()
+        if request.args.get('next'):
+            return redirect(request.args.get('next'))
         return redirect(url_for('dashboard'))
     return render_template('buy.html')
 
@@ -174,22 +176,28 @@ def buy():
 @login_required
 def sell():
     if request.method == 'POST':
-        stock = db.session.execute(db.select(StockData).filter_by(user_username=current_user.username, stock=request.form.get('ticker'))).scalar_one()
+        stock = db.session.execute(db.select(StockData).filter_by(user_username=current_user.username, stock=request.form.get('ticker').upper())).scalar_one()
         # user = db.session.execute(db.select(User).filter_by(username=current_user.username)).scalar_one()
-        if int(request.form.get('shares')) > stock.shares:
+        if float(request.form.get('shares')) > stock.shares:
             flash('You cannot sell that many shares!')
             return redirect(url_for('sell'))
-        elif int(request.form.get('shares')) == stock.shares:
+        elif float(request.form.get('shares')) == stock.shares:
             db.session.delete(stock)
-        stock.shares -= int(request.form.get('shares'))
+        stock.shares -= float(request.form.get('shares'))
         current_user.cash += float(requests.get(f'https://www.alphavantage.co/query?'
                                    f'function=GLOBAL_QUOTE&'
                                    f'symbol={request.form.get('ticker')}&'
-                                   f'apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price']) * int(request.form.get('shares'))
+                                   f'apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price']) * float(request.form.get('shares'))
         db.session.commit()
         return redirect(url_for('dashboard'))
     return render_template('buy.html')
 
+@app.route('/delete')
+def delete():
+    db.session.delete(current_user)
+    logout_user()
+    return redirect(url_for('home'))
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True, port=8080)

@@ -2,9 +2,23 @@
 
 {% block body %}
     <h1>Stock Market Craziness!!!</h1>
-    <p>SMC is a stock market game. It uses real stocks, but fake money.
-    <p>Let's get started! Login or register to continue.</p>
 
+    <div class="card card-body">
+        <h2 class="home-heading">Info</h2>
+        <p>SMC is a stock market game. It uses real stocks, but fake money.
+        <p>Let's get started! Login or register to continue.</p>
+    </div>
+    <br>
+
+    <div class="card card-body">
+        <h2 class="home-heading">How is this different from <a href="https://stockmarketgame.org">stockmarketgame.org</a>?</h2>
+        <p><a href="https://stockmarketgame.org">stockmarketgame.org</a> is for education, while Stock Market Craziness
+        is for fun. As such, anyone can register. That also means that there are more customizable features in development.</p>
+    </div>
+
+    <br>
+
+    <h2 class="home-heading" style="font-size: 3.5em">Let's get started!</h2>
     <div id="login">
         <a href="/login" class="btn btn-outline-info login">Login</a>
         <a href="/register" class="btn btn-primary login">Register</a>

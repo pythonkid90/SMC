@@ -6,14 +6,13 @@ Stock market game made using Flask and Python.
 
 ## Running on your computer
 
-
 1. If you haven't already, [download python.](https://www.python.org/downloads/)
 
 2. Install requirements:
 
         pip install -r requirements.txt
 
-3. Now, go to main.py and uncomment the last few lines:
+3. Now, go to main.py and uncomment the last few lines - 
 
         # if __name__ == '__main__':
         #     app.run(debug=True)
@@ -36,13 +35,15 @@ Stock market game made using Flask and Python.
 5. The final thing you need to do is to type this in the terminal:
 
        python3 main.py
+
+   Navigate to <https://localhost:5000>,
+   and you should have the website running on your computer!
+
    > When you type *python3 main.py* in the terminal, it might say to go to
    > <https://127.0.0.1:5000> instead of <https://localhost:5000>
    > Both will work, as *localhost* is the same as *127.0.0.1*.
+   
 
-You should now have the website running on your computer.
-Navigate to <https://localhost:5000>,
-and you should have the website running on your computer!
 
 <br>
 
