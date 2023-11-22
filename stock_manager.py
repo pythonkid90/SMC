@@ -4,8 +4,10 @@ import requests
 from io import StringIO
 from os import getenv
 
+
 class Stock:
     def __init__(self, stock_range='1D', ticker='AAPL', api_key=getenv('STOCK_API_KEY')):
+
         self.stock_range = stock_range
         self.ticker = ticker
         self.api_key = api_key
@@ -15,7 +17,7 @@ class Stock:
         if self.stock_range is None:
             self.stock_range = '1D'
 
-
+        self.first_trade_day = None
         self.recent_data = None
         self.interval = None
         self.stocks_df = None
@@ -53,7 +55,7 @@ class Stock:
             stock_data = [timedelta(days=d_amount),
                           'TIME_SERIES_INTRADAY']
         elif self.stock_range == 'All':
-            stock_data = [None,    # placeholder
+            stock_data = [None,  # placeholder
                           'TIME_SERIES_WEEKLY_ADJUSTED']
         else:
 
@@ -103,6 +105,27 @@ class Stock:
 
         return self.stocks_df
 
+    # def parse_df(self, stock_func):
+    #
+    #     df_url = (f"https://api.polygon.io/v2/aggs/ticker/AAPL/"
+    #               f"range/1/minute/"
+    #               f"1970-01-01/{date.today().strftime("%Y-%m-%d")}"
+    #               f"?adjusted=true&sort=desc&apiKey=Bp8eNb424HkubDccEx8mhzsyqKqmc1Td")
+    #     print(str(requests.get(df_url).json()))
+    #     # self.stocks_df = pd.read_json(str(requests.get(df_url).json()['results']))
+    #     # print(self.stocks_df)
+    #
+    #     # parse df
+    #     if stock_func == 'TIME_SERIES_WEEKLY_ADJUSTED':
+    #         self.stocks_df = self.stocks_df.rename(columns={"timestamp": "date",
+    #                                                         "close": "unadjusted close",
+    #                                                         'adjusted close': 'close'})
+    #     else:
+    #         self.stocks_df = self.stocks_df.rename(columns={"timestamp": "date"})
+    #     self.stocks_df['date'] = pd.to_datetime(self.stocks_df['date'])
+    #
+    #     return self.stocks_df
+
     def get_recent_data(self):
         # get recent data
 
@@ -111,3 +134,7 @@ class Stock:
 
         if self.time_range_func == 'TIME_SERIES_INTRADAY':
             self.stocks_df = self.recent_data
+
+
+stock = Stock()
+stock.parse_df('hello')

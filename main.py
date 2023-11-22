@@ -59,8 +59,8 @@ def get_stock_data():
                           'shares': user_stock.shares,
                           'start_price': user_stock.start_price,
                           'cur_price': cur_price,
-                          'price_change': price_change,
-                          'price_change_percent': price_change / user_stock.start_price * 100,
+                          'price_change': round(price_change, 2),
+                          'price_change_percent': round(price_change / user_stock.start_price * 100, 2),
                           'earnings': price_change * float(user_stock.shares)}
             stocks.append(stock_data)
 
