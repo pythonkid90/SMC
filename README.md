@@ -1,10 +1,6 @@
-<style>
-   #version {color: blue; font-size: 1.3rem}
-</style>
-
 # Stock Market Craziness
 
-<p id="version">v0.1</p>
+<p style="color:blue; font-size: 1.3rem">v0.1</p>
 
 Play [here.](https://stock-game.onrender.com)
 
@@ -46,7 +42,7 @@ Stock market game made using Flask and Python.
    and you should have the website running on your computer!
 
    > When you type *python3 main.py* in the terminal, it might say to go to
-   > <https://127.0.0.1:5000> instead of <https://localhost:5000>.
+   > <https://127.0.0.1:5000> instead of <https://localhost:5000>
    > Both will work, as *localhost* is the same as *127.0.0.1*.
    
 
