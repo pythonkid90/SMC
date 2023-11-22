@@ -77,16 +77,16 @@ def get_stock_data():
             stocks.append(stock_data)
 
             # total_earnings += price_change * float(user_stock.shares)
-            stock_amount += (cur_price * float(user_stock.shares))
+            stock_amount += round(cur_price * float(user_stock.shares), 2)
 
-    user = db.session.execute(db.select(User).filter_by(username=current_user.username)).scalar_one()
-    user.money = current_user.money + stock_amount
+    # user = db.session.execute(db.select(User).filter_by(username=current_user.username)).scalar_one()
+    current_user.money = current_user.money + stock_amount
 
     return stocks, stock_amount
 
 
 with app.app_context():
-    # db.drop_all()
+    db.drop_all()
     db.create_all()
 
 
