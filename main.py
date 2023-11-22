@@ -157,7 +157,8 @@ def buy():
 
         stock_in_db = db.session.execute(
             db.select(StockData).filter_by(stock=request.form.get('ticker'))).scalar_one_or_none()
-        if stock_in_db:
+
+        if stock_in_db and stock_in_db.start_price == start_price:
             stock_in_db.shares += float(request.form.get('shares'))
         else:
             db.session.add(StockData(stock=request.form.get('ticker').upper(),
