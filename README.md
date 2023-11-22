@@ -1,10 +1,6 @@
-<style type="text/css">
-   #version {color:blue; font-size: 1.3rem}
-</style>
-
 # Stock Market Craziness
 
-<p id="version">v0.1</p>
+<p style="color:blue; font-size: 1.3rem">v0.1</p>
 
 Play [here.](https://stock-game.onrender.com)
 
