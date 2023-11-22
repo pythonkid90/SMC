@@ -86,10 +86,7 @@ def get_stock_data():
 
 
 with app.app_context():
-    db.drop_all()
     db.create_all()
-    db.session.get(User, 1).money = 100072.0
-    db.session.commit()
 
 
 @login_manager.user_loader
