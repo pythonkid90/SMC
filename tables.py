@@ -8,6 +8,7 @@ def init_tables(db):
         password = db.Column(db.String, nullable=False)
         cash = db.Column(db.Float, nullable=False)
         money = db.Column(db.Float, nullable=False)
+        starting_money = db.Column(db.Float, nullable=False)
         stocks = db.relationship('StockData', backref='user')
 
 

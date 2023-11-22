@@ -27,7 +27,6 @@ login_manager.login_view = "login"
 
 
 def create_plot():
-    print(request.args.get('ticker'))
     if request.args.get('ticker'):
         stock = Stock(stock_range=request.args.get('time-range'), ticker=request.args.get('ticker'))
 
@@ -86,6 +85,7 @@ def get_stock_data():
 
 
 with app.app_context():
+    db.drop_all()
     db.create_all()
 
 
