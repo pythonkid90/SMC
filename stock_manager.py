@@ -134,7 +134,3 @@ class Stock:
 
         if self.time_range_func == 'TIME_SERIES_INTRADAY':
             self.stocks_df = self.recent_data
-
-
-stock = Stock()
-stock.parse_df('hello')
