@@ -5,7 +5,7 @@ import requests
 from sqlalchemy.exc import NoResultFound
 import plotly.express as px
 
-from flask import Flask, render_template, request, redirect, url_for, flash, stream_template
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 
@@ -101,7 +101,7 @@ def dashboard():
 
     stocks, stock_amount = get_stock_data()
 
-    return stream_template('dashboard.html', ticker=ticker, cur_time_range=time_range, stocks=stocks,
+    return render_template('dashboard.html', ticker=ticker, cur_time_range=time_range, stocks=stocks,
                            stock_amount=stock_amount, stock_price=price)
 
 
