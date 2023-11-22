@@ -47,12 +47,9 @@ def create_plot():
 def get_stock_data():
     stocks = []
     stock_amount = 0
-    total_earnings = 0
     current_user.money = current_user.cash
     for user_stock in StockData.query.all():
         if user_stock.user_username == current_user.username:
-
-
             cur_price = float(requests.get(f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE'
                                            f'&symbol={user_stock.stock}'
                                            f'&apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price'])
@@ -89,12 +86,12 @@ def load_user(user_id):
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    # # Create Plot # #
     ticker, time_range = create_plot()
 
     stocks, stock_amount = get_stock_data()
 
-    return stream_template('dashboard.html', ticker=ticker, cur_time_range=time_range, stocks=stocks, stock_amount=stock_amount)
+    return stream_template('dashboard.html', ticker=ticker, cur_time_range=time_range, stocks=stocks,
+                           stock_amount=stock_amount)
 
 
 @app.route('/')
@@ -151,14 +148,15 @@ def logout():
 def buy():
     if request.method == 'POST':
         start_price = float(requests.get(f'https://www.alphavantage.co/query?'
-                                   f'function=GLOBAL_QUOTE&'
-                                   f'symbol={request.form.get('ticker')}&'
-                                   f'apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price'])
+                                         f'function=GLOBAL_QUOTE&'
+                                         f'symbol={request.form.get('ticker')}&'
+                                         f'apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price'])
         if start_price * float(request.form.get('shares')) > current_user.cash:
             flash('You cannot afford to buy that many shares!')
             return redirect(url_for('buy'))
 
-        stock_in_db = db.session.execute(db.select(StockData).filter_by(stock=request.form.get('ticker'))).scalar_one_or_none()
+        stock_in_db = db.session.execute(
+            db.select(StockData).filter_by(stock=request.form.get('ticker'))).scalar_one_or_none()
         if stock_in_db:
             stock_in_db.shares += float(request.form.get('shares'))
         else:
@@ -180,7 +178,9 @@ def buy():
 @login_required
 def sell():
     if request.method == 'POST':
-        stock = db.session.execute(db.select(StockData).filter_by(user_username=current_user.username, stock=request.form.get('ticker').upper())).scalar_one()
+        stock = db.session.execute(db.select(StockData).filter_by(user_username=current_user.username,
+                                                                  stock=request.form.get(
+                                                                      'ticker').upper())).scalar_one()
         # user = db.session.execute(db.select(User).filter_by(username=current_user.username)).scalar_one()
         if float(request.form.get('shares')) > stock.shares:
             flash('You cannot sell that many shares!')
@@ -189,12 +189,14 @@ def sell():
             db.session.delete(stock)
         stock.shares -= float(request.form.get('shares'))
         current_user.cash += float(requests.get(f'https://www.alphavantage.co/query?'
-                                   f'function=GLOBAL_QUOTE&'
-                                   f'symbol={request.form.get('ticker')}&'
-                                   f'apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price']) * float(request.form.get('shares'))
+                                                f'function=GLOBAL_QUOTE&'
+                                                f'symbol={request.form.get('ticker')}&'
+                                                f'apikey={getenv('STOCK_API_KEY')}').json()['Global Quote'][
+                                       '05. price']) * float(request.form.get('shares'))
         db.session.commit()
         return redirect(url_for('dashboard'))
     return render_template('buy.html')
+
 
 @app.route('/delete')
 def delete():
@@ -202,6 +204,5 @@ def delete():
     logout_user()
     return redirect(url_for('home'))
 
-
 # if __name__ == '__main__':
-#     app.run(debug=True, port=8080)
+#     app.run(debug=True)
