@@ -67,7 +67,6 @@
                         </td>
                         <td>
                             ${{row['price_change']}} ({{row['price_change_percent']}}%)
-                            <!--^ 10.0% ($10)-->
                         </td>
                         <td>
                             ${{row['earnings']}}
@@ -86,6 +85,9 @@
         </form>
         <br>
         {% if ticker %}
+            <h3>{{ticker}}</h3>
+            <h3>{{stock_price}}</h3>
+
             <div class="button-group">
                 {% for time_range in ['1D', '3D', '5D', '10D', '1M', '3M', '6M', 'YTD', '1Y', '5Y', 'All'] %}
                     {% if cur_time_range == time_range %}

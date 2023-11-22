@@ -38,10 +38,22 @@ def create_plot():
 
         ticker = request.args.get('ticker') if request.args.get('ticker') else 'AAPL'
         time_range = request.args.get('time-range') if request.args.get('time-range') else '1D'
+        price = int(stock.stocks_df.close[0])
     else:
-        ticker, time_range = None, None
+        ticker, time_range, price = None, None, None
 
-    return ticker, time_range
+    return ticker, time_range, price
+
+
+def get_cur_price(ticker):
+    if not getenv('POLYGON_API_KEY'):
+        return float(requests.get(f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE'
+                                  f'&symbol={ticker}'
+                                  f'&apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price'])
+    else:
+        return float(requests.get(f"https://api.polygon.io/v2/aggs/ticker/{ticker}"
+                                  f"/prev?adjusted=true&apiKey={getenv('POLYGON_API_KEY')}"
+                                  ).json()['results'][0]['c'])
 
 
 def get_stock_data():
@@ -50,9 +62,8 @@ def get_stock_data():
     current_user.money = current_user.cash
     for user_stock in StockData.query.all():
         if user_stock.user_username == current_user.username:
-            cur_price = float(requests.get(f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE'
-                                           f'&symbol={user_stock.stock}'
-                                           f'&apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price'])
+            cur_price = get_cur_price(user_stock.stock)
+
             price_change = float(cur_price) - float(user_stock.start_price)
 
             stock_data = {'ticker': user_stock.stock,
@@ -86,12 +97,12 @@ def load_user(user_id):
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    ticker, time_range = create_plot()
+    ticker, time_range, price = create_plot()
 
     stocks, stock_amount = get_stock_data()
 
     return stream_template('dashboard.html', ticker=ticker, cur_time_range=time_range, stocks=stocks,
-                           stock_amount=stock_amount)
+                           stock_amount=stock_amount, stock_price=price)
 
 
 @app.route('/')
@@ -147,10 +158,7 @@ def logout():
 @login_required
 def buy():
     if request.method == 'POST':
-        start_price = float(requests.get(f'https://www.alphavantage.co/query?'
-                                         f'function=GLOBAL_QUOTE&'
-                                         f'symbol={request.form.get('ticker')}&'
-                                         f'apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price'])
+        start_price = get_cur_price(request.form.get('ticker'))
         if start_price * float(request.form.get('shares')) > current_user.cash:
             flash('You cannot afford to buy that many shares!')
             return redirect(url_for('buy'))
@@ -189,11 +197,7 @@ def sell():
         elif float(request.form.get('shares')) == stock.shares:
             db.session.delete(stock)
         stock.shares -= float(request.form.get('shares'))
-        current_user.cash += float(requests.get(f'https://www.alphavantage.co/query?'
-                                                f'function=GLOBAL_QUOTE&'
-                                                f'symbol={request.form.get('ticker')}&'
-                                                f'apikey={getenv('STOCK_API_KEY')}').json()['Global Quote'][
-                                       '05. price']) * float(request.form.get('shares'))
+        current_user.cash += get_cur_price(request.form.get('ticker')) * float(request.form.get('shares'))
         db.session.commit()
         return redirect(url_for('dashboard'))
     return render_template('buy.html')
