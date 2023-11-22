@@ -1,6 +1,6 @@
 # Stock Market Craziness
 
-<p style="color:blue; font-size: 1.3rem">v0.1</p>
+<p style="color:blue; font-size: 1.3rem">v0.2</p>
 
 Play [here.](https://stock-game.onrender.com)
 
@@ -24,14 +24,19 @@ Stock market game made using Flask and Python.
         if __name__ == '__main__':
             app.run(debug=True)
 
-4. After that, you need to claim your api key from <https://alphavantage.co>.
+4. After that, you need to claim your api key from <https://alphavantage.co> or <https://polygon.io>.
+   Choose either one.
    Once you have it, you need to set it as an *environment variable.*
    Usually, you need to run
 
-       export STOCK_API_KEY='[your api key]'
+       export STOCK_API_KEY='[alphavantage api key]'
+   
+   or for Polygon - 
+
+       export POLYGON_API_KEY='[polygon api key]'
    
    However, depending on your IDE (Code editor), you might 
-   need to do something different. On Pycharm, navigate to 
+   need to do something different. On PyCharm, navigate to 
    ***Run > Edit Configurations*** and set your variables there.
 
 5. The final thing you need to do is to type this in the terminal:
