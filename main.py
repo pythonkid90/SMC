@@ -134,7 +134,7 @@ def login():
 def register():
     if request.method == 'POST':
         user = User(username=request.form.get('username'),  # noqa
-                    password=generate_password_hash(request.form.get('password')), money=100000, cash=100000)  # noqa
+                    password=generate_password_hash(request.form.get('password')), money=float(request.form.get('starting_money')), cash=float(request.form.get('starting_money')))  # noqa
         if not User.query.filter_by(username=user.username).scalar():
             db.session.add(user)
             db.session.commit()
