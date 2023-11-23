@@ -54,7 +54,6 @@ def get_cur_price(ticker):
         stock_data = requests.get(f"https://api.polygon.io/v2/aggs/ticker/{ticker}"
                                   f"/prev?adjusted=true&apiKey={getenv('POLYGON_API_KEY')}"
                                   ).json()
-        print(stock_data['results'])
         return float(stock_data['results'][0]['c'])
 
 
@@ -119,7 +118,6 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        print('hasdufhhasdfihasdiofhkahfkjdashfjasdhfkjadhfjkhdfkshjfka')
         try:
             user = db.session.execute(db.select(User).filter_by(username=request.form.get('username'))).scalar_one()
             if check_password_hash(user.password, request.form.get('password')):
@@ -250,5 +248,5 @@ def delete():
 
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)

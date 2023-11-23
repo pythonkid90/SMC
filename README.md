@@ -46,9 +46,9 @@ Stock market game made using Flask and Python.
    Navigate to <https://localhost:5000>,
    and you should have the website running on your computer!
 
-   > When you type *python3 main.py* in the terminal, it might say to go to
-   > <https://127.0.0.1:5000> instead of <https://localhost:5000>
-   > Both will work, as *localhost* is the same as *127.0.0.1*.
+   > When you type *`python3 main.py`* in the terminal, it might say to go to
+   > <https://127.0.0.1:5000> instead of <https://localhost:5000>.
+   > Both will work, as **`localhost`** is the same as **`127.0.0.1`**.
    
 
 
