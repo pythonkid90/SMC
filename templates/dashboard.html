@@ -11,19 +11,19 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Total Equity</h5>
-                    <p class="card-text">${{current_user.money}}</p>
+                    <p class="card-text">${{round(current_user.money, 2)}}</p>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Cash</h5>
-                    <p class="card-text">${{current_user.cash}}</p>
+                    <p class="card-text">${{round(current_user.cash, 2)}}</p>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Money Made</h5>
-                    <p class="card-text">${{current_user.money - current_user.starting_money}}</p>
+                    <p class="card-text">${{round(current_user.money - current_user.starting_money, 2)}}</p>
                 </div>
             </div>
             <div class="card">

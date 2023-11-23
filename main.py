@@ -51,9 +51,11 @@ def get_cur_price(ticker):
                                   f'&symbol={ticker}'
                                   f'&apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price'])
     else:
-        return float(requests.get(f"https://api.polygon.io/v2/aggs/ticker/{ticker}"
+        stock_data = requests.get(f"https://api.polygon.io/v2/aggs/ticker/{ticker}"
                                   f"/prev?adjusted=true&apiKey={getenv('POLYGON_API_KEY')}"
-                                  ).json()['results'][0]['c'])
+                                  ).json()
+        print(stock_data['results'])
+        return float(stock_data['results'][0]['c'])
 
 
 def get_stock_data():
@@ -67,7 +69,7 @@ def get_stock_data():
             price_change = float(cur_price) - float(user_stock.start_price)
 
             stock_data = {'ticker': user_stock.stock,
-                          'shares': user_stock.shares,
+                          'shares': round(user_stock.shares, 2),
                           'start_price': user_stock.start_price,
                           'cur_price': cur_price,
                           'price_change': round(price_change, 2),
@@ -85,7 +87,7 @@ def get_stock_data():
 
 
 with app.app_context():
-    db.drop_all()
+    # db.drop_all()
     db.create_all()
 
 
@@ -102,7 +104,7 @@ def dashboard():
     stocks, stock_amount = get_stock_data()
 
     return render_template('dashboard.html', ticker=ticker, cur_time_range=time_range, stocks=stocks,
-                           stock_amount=stock_amount, stock_price=price)
+                           stock_amount=stock_amount, stock_price=price, round=round)
 
 
 @app.route('/')
@@ -134,7 +136,11 @@ def login():
 def register():
     if request.method == 'POST':
         user = User(username=request.form.get('username'),  # noqa
-                    password=generate_password_hash(request.form.get('password')), money=float(request.form.get('starting_money')), cash=float(request.form.get('starting_money')))  # noqa
+                    password=generate_password_hash(request.form.get('password')),
+                    money=float(request.form.get('starting_money')),
+                    cash=float(request.form.get('starting_money')),
+                    starting_money=float(request.form.get('starting_money')))
+
         if not User.query.filter_by(username=user.username).scalar():
             db.session.add(user)
             db.session.commit()
@@ -163,19 +169,20 @@ def buy():
             flash('You cannot afford to buy that many shares!')
             return redirect(url_for('buy'))
 
-        stock_in_db = db.session.execute(
-            db.select(StockData).filter_by(stock=request.form.get('ticker'))).scalar_one_or_none()
+        stocks_in_db = db.session.execute(
+            db.select(StockData).filter_by(stock=request.form.get('ticker'))).scalars().all()
 
-        if stock_in_db and stock_in_db.start_price == start_price:
-            stock_in_db.shares += float(request.form.get('shares'))
+        if stocks_in_db:
+            for stock in stocks_in_db:
+                if stock.start_price == start_price:
+                    stock.shares += float(request.form.get('shares'))
         else:
             db.session.add(StockData(stock=request.form.get('ticker').upper(),
                                      shares=request.form.get('shares'),
                                      start_price=start_price,
                                      user=current_user
                                      ))
-        # user = db.session.execute(db.select(User).filter_by(username=current_user.username)).scalar_one()
-        current_user.cash -= start_price * float(request.form.get('shares'))
+        current_user.cash -= round(start_price * float(request.form.get('shares')), 2)
         db.session.commit()
         if request.args.get('next'):
             return redirect(request.args.get('next'))
@@ -187,17 +194,35 @@ def buy():
 @login_required
 def sell():
     if request.method == 'POST':
-        stock = db.session.execute(db.select(StockData).filter_by(user_username=current_user.username,
-                                                                  stock=request.form.get(
-                                                                      'ticker').upper())).scalar_one()
-        # user = db.session.execute(db.select(User).filter_by(username=current_user.username)).scalar_one()
-        if float(request.form.get('shares')) > stock.shares:
+        stocks = db.session.execute(db.select(StockData).filter_by(user_username=current_user.username,
+                                                                   stock=request.form.get('ticker').upper())
+                                    ).scalars()
+
+        for stock in stocks:
+
+            if round(float(request.form.get('shares')), 2) == round(stock.shares, 2):
+                shares_to_sell = True
+
+                db.session.delete(stock)
+                break
+            elif stock.shares == 0:
+                shares_to_sell = True
+                db.session.delete(stock)
+                continue
+            elif float(request.form.get('shares')) > round(stock.shares, 2):
+                shares_to_sell = False
+                continue
+            else:
+                shares_to_sell = True
+                stock.shares -= float(request.form.get('shares'))
+
+
+        if shares_to_sell:
+            current_user.cash += get_cur_price(request.form.get('ticker')) * float(request.form.get('shares'))
+        else:
             flash('You cannot sell that many shares!')
             return redirect(url_for('sell'))
-        elif float(request.form.get('shares')) == stock.shares:
-            db.session.delete(stock)
-        stock.shares -= float(request.form.get('shares'))
-        current_user.cash += get_cur_price(request.form.get('ticker')) * float(request.form.get('shares'))
+
         db.session.commit()
         return redirect(url_for('dashboard'))
     return render_template('buy.html')
@@ -209,5 +234,6 @@ def delete():
     logout_user()
     return redirect(url_for('home'))
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+
+if __name__ == '__main__':
+    app.run(debug=True)
