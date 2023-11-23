@@ -46,12 +46,14 @@
                     <th>Shares Invested</th>
                     <th>Starting Price</th>
                     <th>Current Price</th>
+                    <th>Stock Value</th>
                     <th>Price Change</th>
                     <th>Your Earnings</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in stocks %}
+
                     <tr>
                         <td>
                             {{row['ticker']}}
@@ -62,13 +64,23 @@
                         <td>
                             ${{row['start_price']}}
                         </td>
-                        <td>
+
+                        {% if row['cur_price'] - row['start_price'] > 0 %}
+                            {% set color = 'up' %}
+                        {% elif row['cur_price'] - row['start_price'] < 0 %}
+                            {% set color = 'down' %}
+                        {% endif %}
+
+                        <td class="{{color}}">
                             ${{row['cur_price']}}
                         </td>
-                        <td>
+                        <td class="{{color}}">
+                            ${{row['stock_value']}}
+                        </td>
+                        <td class="{{color}}">
                             ${{row['price_change']}} ({{row['price_change_percent']}}%)
                         </td>
-                        <td>
+                        <td class="{{color}}">
                             ${{row['earnings']}}
                         </td>
 
@@ -86,7 +98,7 @@
         <br>
         {% if ticker %}
             <h3>{{ticker}}</h3>
-            <h3>{{stock_price}}</h3>
+            <h3>${{stock_price}}</h3>
 
             <div class="button-group">
                 {% for time_range in ['1D', '3D', '5D', '10D', '1M', '3M', '6M', 'YTD', '1Y', '5Y', 'All'] %}
@@ -104,3 +116,5 @@
     </section>
 
 {% endblock %}
+
+

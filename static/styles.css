@@ -27,6 +27,15 @@ p {
     --bs-btn-padding-x: 1em;
     --bs-btn-font-size: 4em;
 }
+.btn-xl {
+    --bs-btn-padding-y: 0.1em;
+    --bs-btn-padding-x: 0.5em;
+    --bs-btn-font-size: 3em;
+}
+.danger-form {
+    text-align: center;
+    font-weight: bolder;
+}
 #login {
     text-align: center
 }
@@ -34,10 +43,13 @@ input {
     display: inline;
     width: auto;
 }
-.flash {
+.flash, .danger{
     display: block;
     color: red;
     text-align: center;
+}
+.danger {
+    font-size: 3em;
 }
 h2 {
     font-size: 2em;
@@ -55,6 +67,14 @@ nav {
     margin: 0.2em
 }
 h3 {
-    font-size: 2em;
+    margin-bottom: 0.5em;
     text-align: center;
+    font-size: 3em;
+    font-weight: 800;
+}
+td[class="up"] {
+    color: green;
+}
+td[class="down"] {
+    color: red;
 }

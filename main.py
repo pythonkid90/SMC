@@ -74,7 +74,8 @@ def get_stock_data():
                           'cur_price': cur_price,
                           'price_change': round(price_change, 2),
                           'price_change_percent': round(price_change / user_stock.start_price * 100, 2),
-                          'earnings': round(price_change * float(user_stock.shares), 2)}
+                          'earnings': round(price_change * float(user_stock.shares), 2),
+                          'stock_value': round(cur_price * float(user_stock.shares), 2)}
             stocks.append(stock_data)
 
             # total_earnings += price_change * float(user_stock.shares)
@@ -104,7 +105,7 @@ def dashboard():
     stocks, stock_amount = get_stock_data()
 
     return render_template('dashboard.html', ticker=ticker, cur_time_range=time_range, stocks=stocks,
-                           stock_amount=stock_amount, stock_price=price, round=round)
+                           stock_amount=stock_amount, stock_price=price, round=round, float=float)
 
 
 @app.route('/')
@@ -118,17 +119,23 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        print('hasdufhhasdfihasdiofhkahfkjdashfjasdhfkjadhfjkhdfkshjfka')
         try:
             user = db.session.execute(db.select(User).filter_by(username=request.form.get('username'))).scalar_one()
             if check_password_hash(user.password, request.form.get('password')):
+
                 login_user(user)
-                return redirect(url_for('dashboard'))
+                if request.args.get('next'):
+                    return redirect(request.args.get('next'))
+                else:
+                    return redirect(url_for('dashboard'))
+
             else:
                 flash('Wrong password. Please try again.')
         except NoResultFound:
             flash('Username does not exist. Please try again.')
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+
+
     return render_template('login.html')
 
 
@@ -216,8 +223,7 @@ def sell():
                 shares_to_sell = True
                 stock.shares -= float(request.form.get('shares'))
 
-
-        if shares_to_sell:
+        if shares_to_sell:  # noqa
             current_user.cash += get_cur_price(request.form.get('ticker')) * float(request.form.get('shares'))
         else:
             flash('You cannot sell that many shares!')
@@ -228,11 +234,20 @@ def sell():
     return render_template('buy.html')
 
 
-@app.route('/delete')
+@app.route('/delete', methods=['GET', 'POST'])
+@login_required
 def delete():
-    db.session.delete(current_user)
-    logout_user()
-    return redirect(url_for('home'))
+    if request.method == "POST":
+        if check_password_hash(current_user.password, request.form.get('password')):
+            db.session.delete(current_user)
+            db.session.commit()
+            logout_user()
+        else:
+            flash('Wrong password.')
+        return redirect(url_for('home'))
+
+    return render_template('delete.html')
+
 
 
 if __name__ == '__main__':
