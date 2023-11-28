@@ -11,19 +11,19 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Total Equity</h5>
-                    <p class="card-text">${{round(current_user.money, 2)}}</p>
+                    <p class="card-text">${{stats['equity']}}</p>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Cash</h5>
-                    <p class="card-text">${{round(current_user.cash, 2)}}</p>
+                    <p class="card-text">${{stats['cash']}}</p>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Money Made</h5>
-                    <p class="card-text">${{round(current_user.money - current_user.starting_money, 2)}}</p>
+                    <p class="card-text">${{stats['money_made']}}</p>
                 </div>
             </div>
             <div class="card">
@@ -59,29 +59,29 @@
                             {{row['ticker']}}
                         </td>
                         <td>
-                            {{row['shares']}}
+                            {{ row['shares'] }}
                         </td>
                         <td>
-                            ${{row['start_price']}}
+                            ${{ row['start_price'] }}
                         </td>
 
-                        {% if row['cur_price'] - row['start_price'] > 0 %}
+                        {% if row['cur_price_float'] - row['start_price_float'] > 0 %}
                             {% set color = 'up' %}
-                        {% elif row['cur_price'] - row['start_price'] < 0 %}
+                        {% elif row['cur_price_float'] - row['start_price_float'] < 0 %}
                             {% set color = 'down' %}
                         {% endif %}
 
                         <td class="{{color}}">
-                            ${{row['cur_price']}}
+                            ${{ row['cur_price'] }}
                         </td>
                         <td class="{{color}}">
-                            ${{row['stock_value']}}
+                            ${{ row['stock_value'] }}
                         </td>
                         <td class="{{color}}">
-                            ${{row['price_change']}} ({{row['price_change_percent']}}%)
+                            ${{ row['price_change'] }} ({{ row['price_change_percent'] }}%)
                         </td>
                         <td class="{{color}}">
-                            ${{row['earnings']}}
+                            ${{ row['earnings'] }}
                         </td>
 
                     </tr>

@@ -1,6 +1,5 @@
 from secrets import token_hex
 from os import getenv
-
 import requests
 from sqlalchemy.exc import NoResultFound
 import plotly.express as px
@@ -60,7 +59,7 @@ def get_cur_price(ticker):
 def get_stock_data():
     stocks = []
     stock_amount = 0
-    current_user.money = current_user.cash
+
     for user_stock in StockData.query.all():
         if user_stock.user_username == current_user.username:
             cur_price = get_cur_price(user_stock.stock)
@@ -68,22 +67,35 @@ def get_stock_data():
             price_change = float(cur_price) - float(user_stock.start_price)
 
             stock_data = {'ticker': user_stock.stock,
-                          'shares': round(user_stock.shares, 2),
-                          'start_price': user_stock.start_price,
-                          'cur_price': cur_price,
-                          'price_change': round(price_change, 2),
-                          'price_change_percent': round(price_change / user_stock.start_price * 100, 2),
-                          'earnings': round(price_change * float(user_stock.shares), 2),
-                          'stock_value': round(cur_price * float(user_stock.shares), 2)}
+                          'shares': f"{round(user_stock.shares, 2):,}",
+                          'start_price': f"{round(user_stock.start_price, 2):,}",
+                          'cur_price': f"{cur_price:,}",
+                          'start_price_float': round(user_stock.start_price, 2),
+                          'cur_price_float': cur_price,
+                          'price_change': f"{round(price_change, 2):,}",
+                          'price_change_percent': f"{round(price_change / user_stock.start_price * 100, 2):,}",
+                          'earnings': f"{round(price_change * float(user_stock.shares), 2):,}",
+                          'stock_value': f"{round(cur_price * float(user_stock.shares), 2):,}"}
             stocks.append(stock_data)
 
             # total_earnings += price_change * float(user_stock.shares)
             stock_amount += round(cur_price * float(user_stock.shares), 2)
 
+    stock_amount_str = f"{stock_amount:,}"
     # user = db.session.execute(db.select(User).filter_by(username=current_user.username)).scalar_one()
-    current_user.money = current_user.money + stock_amount
+    current_user.money = current_user.cash + stock_amount
+    db.session.commit()
 
-    return stocks, stock_amount
+    return stocks, stock_amount_str
+
+def get_stats_data():
+    stats = {
+        'equity': f"{round(current_user.money, 2):,}",
+        'cash': f"{round(current_user.cash, 2):,}",
+        'money_made': f"{round(current_user.money - current_user.starting_money, 2):,}"
+    }
+
+    return stats
 
 
 with app.app_context():
@@ -101,10 +113,15 @@ def load_user(user_id):
 def dashboard():
     ticker, time_range, price = create_plot()
 
+    # current_user.cash = 1000000 - 106517
+    # db.session.commit()
+
     stocks, stock_amount = get_stock_data()
 
+    stats = get_stats_data()
+
     return render_template('dashboard.html', ticker=ticker, cur_time_range=time_range, stocks=stocks,
-                           stock_amount=stock_amount, stock_price=price, round=round, float=float)
+                           stock_amount=stock_amount, stock_price=price, round=round, stats=stats)
 
 
 @app.route('/')
@@ -132,7 +149,6 @@ def login():
                 flash('Wrong password. Please try again.')
         except NoResultFound:
             flash('Username does not exist. Please try again.')
-
 
     return render_template('login.html')
 
@@ -175,12 +191,11 @@ def buy():
             return redirect(url_for('buy'))
 
         stocks_in_db = db.session.execute(
-            db.select(StockData).filter_by(stock=request.form.get('ticker'))).scalars().all()
+            db.select(StockData).filter_by(stock=request.form.get('ticker'), start_price=start_price)).scalars().all()
 
         if stocks_in_db:
             for stock in stocks_in_db:
-                if stock.start_price == start_price:
-                    stock.shares += float(request.form.get('shares'))
+                stock.shares += float(request.form.get('shares'))
         else:
             db.session.add(StockData(stock=request.form.get('ticker').upper(),
                                      shares=request.form.get('shares'),
@@ -189,8 +204,6 @@ def buy():
                                      ))
         current_user.cash -= round(start_price * float(request.form.get('shares')), 2)
         db.session.commit()
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
         return redirect(url_for('dashboard'))
     return render_template('buy.html')
 
@@ -247,6 +260,5 @@ def delete():
     return render_template('delete.html')
 
 
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
