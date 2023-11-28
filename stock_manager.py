@@ -105,27 +105,6 @@ class Stock:
 
         return self.stocks_df
 
-    # def parse_df(self, stock_func):
-    #
-    #     df_url = (f"https://api.polygon.io/v2/aggs/ticker/AAPL/"
-    #               f"range/1/minute/"
-    #               f"1970-01-01/{date.today().strftime("%Y-%m-%d")}"
-    #               f"?adjusted=true&sort=desc&apiKey=Bp8eNb424HkubDccEx8mhzsyqKqmc1Td")
-    #     print(str(requests.get(df_url).json()))
-    #     # self.stocks_df = pd.read_json(str(requests.get(df_url).json()['results']))
-    #     # print(self.stocks_df)
-    #
-    #     # parse df
-    #     if stock_func == 'TIME_SERIES_WEEKLY_ADJUSTED':
-    #         self.stocks_df = self.stocks_df.rename(columns={"timestamp": "date",
-    #                                                         "close": "unadjusted close",
-    #                                                         'adjusted close': 'close'})
-    #     else:
-    #         self.stocks_df = self.stocks_df.rename(columns={"timestamp": "date"})
-    #     self.stocks_df['date'] = pd.to_datetime(self.stocks_df['date'])
-    #
-    #     return self.stocks_df
-
     def get_recent_data(self):
         # get recent data
 

@@ -47,12 +47,13 @@ def create_plot():
 def get_cur_price(ticker):
     if not getenv('POLYGON_API_KEY'):
         return float(requests.get(f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE'
-                                  f'&symbol={ticker}'
+                                  f'&symbol={ticker.upper()}'
                                   f'&apikey={getenv('STOCK_API_KEY')}').json()['Global Quote']['05. price'])
     else:
-        stock_data = requests.get(f"https://api.polygon.io/v2/aggs/ticker/{ticker}"
+        stock_data = requests.get(f"https://api.polygon.io/v2/aggs/ticker/{ticker.upper()}"
                                   f"/prev?adjusted=true&apiKey={getenv('POLYGON_API_KEY')}"
                                   ).json()
+        print(stock_data)
         return float(stock_data['results'][0]['c'])
 
 
@@ -87,6 +88,7 @@ def get_stock_data():
     db.session.commit()
 
     return stocks, stock_amount_str
+
 
 def get_stats_data():
     stats = {
@@ -191,11 +193,10 @@ def buy():
             return redirect(url_for('buy'))
 
         stocks_in_db = db.session.execute(
-            db.select(StockData).filter_by(stock=request.form.get('ticker'), start_price=start_price)).scalars().all()
-
+            db.select(StockData).filter_by(stock=request.form.get('ticker').upper(),
+                                           start_price=start_price)).scalars().all()
         if stocks_in_db:
-            for stock in stocks_in_db:
-                stock.shares += float(request.form.get('shares'))
+            stocks_in_db[0].shares += float(request.form.get('shares'))
         else:
             db.session.add(StockData(stock=request.form.get('ticker').upper(),
                                      shares=request.form.get('shares'),
@@ -216,6 +217,9 @@ def sell():
                                                                    stock=request.form.get('ticker').upper())
                                     ).scalars()
 
+        shares_to_sell, shares_sold = False, 0
+        shares_left = request.form.get('shares')
+
         for stock in stocks:
 
             if round(float(request.form.get('shares')), 2) == round(stock.shares, 2):
@@ -226,16 +230,21 @@ def sell():
             elif stock.shares == 0:
                 shares_to_sell = True
                 db.session.delete(stock)
-                continue
-            elif float(request.form.get('shares')) > round(stock.shares, 2):
-                shares_to_sell = False
-                continue
+            elif float(shares_left) > round(stock.shares, 2):
+                shares_to_sell = True
+                db.session.delete(stock)
+                shares_left = str(float(shares_left) - float(round(stock.shares, 2)))
+                shares_sold += float(round(stock.shares, 2))
             else:
                 shares_to_sell = True
                 stock.shares -= float(request.form.get('shares'))
 
-        if shares_to_sell:  # noqa
-            current_user.cash += get_cur_price(request.form.get('ticker')) * float(request.form.get('shares'))
+        if shares_to_sell:
+            if shares_sold:
+                current_user.cash += get_cur_price(request.form.get('ticker')) * shares_sold
+            else:
+                current_user.cash += get_cur_price(request.form.get('ticker')) * float(request.form.get('shares'))
+
         else:
             flash('You cannot sell that many shares!')
             return redirect(url_for('sell'))

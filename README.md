@@ -64,8 +64,3 @@ and you should have the website running on your computer!
 > <https://127.0.0.1:5000> instead of <https://localhost:5000>.
 > Both will work, as **`localhost`** is the same as **`127.0.0.1`**.
 
-
-
-<br>
-
-
