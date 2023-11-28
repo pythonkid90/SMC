@@ -12,44 +12,58 @@ Stock market game made using Flask and Python.
 
 2. Install requirements:
 
-        pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 3. Now, go to main.py and uncomment the last few lines - 
 
-        # if __name__ == '__main__':
-        #     app.run(debug=True)
+   ```python
+   # if __name__ == '__main__':
+       # app.run(debug=True)
+   ```
 
    should become
 
-        if __name__ == '__main__':
-            app.run(debug=True)
+   ```python
+   if __name__ == '__main__':
+       app.run(debug=True)
+   ```
 
-4. After that, you need to claim your api key from <https://alphavantage.co> or <https://polygon.io>.
-   Choose either one.
+4. After that, you need to claim your api key from <https://alphavantage.co> and <https://polygon.io>.
+   Alphavantage is mandatory, and Polygon is optional.
+   I recommend to claim an api key from both as it gives you more api credits.
+
    Once you have it, you need to set it as an *environment variable.*
    Usually, you need to run
 
-       export STOCK_API_KEY='[alphavantage api key]'
+   ```bash
+   export STOCK_API_KEY='[alphavantage api key]'
+   ```
    
-   or for Polygon - 
+   and for Polygon - 
 
-       export POLYGON_API_KEY='[polygon api key]'
+   ```bash
+   export POLYGON_API_KEY='[polygon api key]'
+   ```
    
    However, depending on your IDE (Code editor), you might 
    need to do something different. On PyCharm, navigate to 
-   ***Run > Edit Configurations*** and set your variables there.
+   ***Run > Edit Configurations*** and set your variables there. R
 
 5. The final thing you need to do is to type this in the terminal:
 
-       python3 main.py
+   ```bash
+   python3 main.py
+   ```
 
-   Navigate to <https://localhost:5000>,
-   and you should have the website running on your computer!
+Navigate to <https://localhost:5000>,
+and you should have the website running on your computer!
 
-   > When you type *`python3 main.py`* in the terminal, it might say to go to
-   > <https://127.0.0.1:5000> instead of <https://localhost:5000>.
-   > Both will work, as **`localhost`** is the same as **`127.0.0.1`**.
-   
+> When you type *`python3 main.py`* in the terminal, it might say to go to
+> <https://127.0.0.1:5000> instead of <https://localhost:5000>.
+> Both will work, as **`localhost`** is the same as **`127.0.0.1`**.
+
 
 
 <br>
